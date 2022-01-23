@@ -2,19 +2,19 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"net/http"
 )
 
 func main() {
-	fmt.Println("Starting service...")
+	StartServer()
 }
 
-/*
-  Methods
+func StartServer() {
+	http.HandleFunc("/", landingPageHandler)
+	log.Fatal(http.ListenAndServe(":5000", nil))
+}
 
-  createClient
-  createAccount
-  createTransaction
-  getClient
-  getAccount
-  getTransaction
-*/
+func landingPageHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Starting server... Requested: %s\n", r.URL.Path)
+}

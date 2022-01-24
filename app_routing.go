@@ -7,17 +7,15 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
-const (
-	host = "queenie.db.elephantsql.com"
-	port = "5432"
-)
-
-func (a *App) Initialize(user, password, dbname string) {
-	connectionStr := fmt.Sprintf("host=%s port=%v user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
+func (a *App) Initialize(host, port, user, password, dbname string) {
+	connectionStr := fmt.Sprintf(
+		"host=%s port=%v user=%s "+
+			"password=%s dbname=%s sslmode=disable",
+		host, port, user, password, dbname,
+	)
 
 	var err error
 	a.DB, err = sql.Open("pgx", connectionStr)
@@ -31,15 +29,17 @@ func (a *App) Initialize(user, password, dbname string) {
 	// a.InitAccountRoutes()
 	a.InitClientRoutes()
 	// a.InitTransactionRoutes()
+	log.Println("API initialized!")
 }
 
-func (a *App) Run(addr string) {
-	log.Fatal(http.ListenAndServe(":3005", a.Router))
+func (a *App) Run(p string) {
+	port := fmt.Sprintf(":%s", p)
+	log.Printf("Running at port: %s\n", p)
+	log.Fatal(http.ListenAndServe(port, a.Router))
 }
 
 /* Initializing routes to retreive Client's data */
 func (a *App) InitClientRoutes() {
-	fmt.Println("Initialized Client Routes")
 	// a.Router.HandleFunc("/api/v1/client", a.GetClients).Methods("GET")
 	a.Router.HandleFunc("/api/v1/client/new", a.CreateClient).Methods("POST")
 	a.Router.HandleFunc("/api/v1/client/{id:[0-9]+}", a.GetClient).Methods("GET")

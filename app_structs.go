@@ -1,6 +1,24 @@
-package model
+package main
 
-import "time"
+import (
+	"database/sql"
+	"time"
+
+	"github.com/gorilla/mux"
+)
+
+/*
+	Main App Structures
+*/
+
+type App struct {
+	Router *mux.Router
+	DB     *sql.DB
+}
+
+/*
+	Client Structures
+*/
 
 type Client struct {
 	Id        uint64 `json:"clientId"`
@@ -43,4 +61,44 @@ type Address struct {
 	State          string `json:"state"`
 	Country        string `json:"country"`
 	ClientId       uint64 `json:"clientId"`
+}
+
+/*
+	Account Structures
+*/
+
+type Account struct {
+	Id          uint64
+	Currency    string
+	AccountType uint16
+	Balance     uint32
+	Active      bool
+	ClientId    uint64
+}
+
+/*
+	Transaction Structures
+*/
+
+type Transaction struct {
+	Id              uint64
+	Amount          uint32
+	TransactionType TransactionType
+	Description     string
+	DateTime        time.Time
+	FromAccountId   uint64
+	ToAccountId     uint64
+}
+
+type TransactionType int
+
+// Dictionary of TransactionType
+var DictTransactionType = struct {
+	Deposit  TransactionType
+	Withdraw TransactionType
+	Transfer TransactionType
+}{
+	Deposit:  1,
+	Withdraw: 2,
+	Transfer: 3,
 }

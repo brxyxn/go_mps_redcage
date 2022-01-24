@@ -3,18 +3,27 @@ package main
 import (
 	"fmt"
 	"log"
-	"net/http"
+	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
-	StartServer()
+	a := App{}
+
+	fmt.Println(dotEnvGet("TESTING"))
+
+	a.Initialize(
+		dotEnvGet("DEV_DB_USERNAME"),
+		dotEnvGet("DEV_DB_PASSWORD"),
+		dotEnvGet("DEV_DB_NAME"),
+	)
 }
 
-func StartServer() {
-	http.HandleFunc("/", landingPageHandler)
-	log.Fatal(http.ListenAndServe(":5000", nil))
-}
-
-func landingPageHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Starting server... Requested: %s\n", r.URL.Path)
+func dotEnvGet(key string) string {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file")
+	}
+	return os.Getenv(key)
 }

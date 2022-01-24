@@ -1,9 +1,7 @@
-package models
+package main
 
 import (
 	"database/sql"
-
-	model "github.com/brxyxn/go_mps_redcage/structs"
 )
 
 /*
@@ -16,24 +14,20 @@ CREATE TABLE public.clients (
 );
 */
 
-type ClientRef struct {
-	*model.Client
-}
-
-func (p *ClientRef) CreateClient(db *sql.DB) error {
+func (p *Client) CreateClient(db *sql.DB) error {
 	return db.QueryRow(
 		"INSERT INTO public.clients(firstname, lastname, username) VALUES($1, $2, $3) RETURNING id",
-		&p.Client.Firstname, &p.Client.Lastname, &p.Client.Username,
+		&p.Firstname, &p.Lastname, &p.Username,
 	).Scan(
-		&p.Client.Id,
+		&p.Id,
 	)
 }
 
-func (p *ClientRef) GetClient(db *sql.DB) error {
+func (p *Client) GetClient(db *sql.DB) error {
 	return db.QueryRow(
 		"SELECT * FROM public.clients WHERE id=$1",
-		&p.Client.Id,
+		&p.Id,
 	).Scan(
-		&p.Client.Id, &p.Client.Firstname, &p.Client.Lastname, &p.Client.Username, &p.Client.Active,
+		&p.Id, &p.Firstname, &p.Lastname, &p.Username, &p.Active,
 	)
 }

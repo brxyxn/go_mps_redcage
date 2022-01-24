@@ -1,9 +1,13 @@
-package utils
+package main
 
 import (
 	"encoding/json"
 	"net/http"
 )
+
+/*
+	Error Handling
+*/
 
 func RespondWithError(w http.ResponseWriter, code int, message string) {
 	RespondWithJSON(w, code, map[string]string{"error": message})

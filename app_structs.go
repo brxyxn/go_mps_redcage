@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"time"
 
 	"github.com/gorilla/mux"
 )
@@ -25,12 +24,14 @@ type Client struct {
 	Firstname string `json:"firstName"`
 	Lastname  string `json:"lastName"`
 	Username  string `json:"username"`
-	Active    bool   `json:"active"`
+	Active    bool   `json:"active,omitempty"`
+	CreatedAt string `json:"createdAt,omitempty"`
 }
 
+/*
 type Profile struct {
 	Id                uint64      `json:"profileId"`
-	DateOfBirth       time.Time   `json:"dateOfBirth"`
+	DateOfBirth       string   `json:"dateOfBirth"`
 	ProfilePicture    string      `json:"profilePicture"` // base64
 	Contact           ContactInfo `json:"contact"`
 	PhysicalAddress   Address     `json:"physicalAddress"`
@@ -62,32 +63,51 @@ type Address struct {
 	Country        string `json:"country"`
 	ClientId       uint64 `json:"clientId"`
 }
+*/
 
 /*
 	Account Structures
 */
 
+type Accounts []Account
+
 type Account struct {
-	Id          uint64
-	Currency    string
-	AccountType uint16
-	Balance     uint32
-	Active      bool
-	ClientId    uint64
+	Id          uint64      `json:"accountId"`
+	Balance     float32     `json:"balance"`
+	Currency    string      `json:"currency"`
+	AccountType AccountType `json:"accountType"`
+	Active      bool        `json:"active,omitempty"`
+	ClientId    uint64      `json:"clientId"`
+	CreatedAt   string      `json:"createdAt,omitempty"`
+}
+
+type AccountType string
+
+// Dictionary of AccountType
+var DictAccountType = struct {
+	Savings    AccountType
+	Checking   AccountType
+	CreditCard AccountType
+}{
+	Savings:    "Savings",
+	Checking:   "Checking",
+	CreditCard: "Credit Card",
 }
 
 /*
 	Transaction Structures
 */
 
+type Transactions []Transaction
+
 type Transaction struct {
-	Id              uint64
-	Amount          uint32
-	TransactionType TransactionType
-	Description     string
-	DateTime        time.Time
-	FromAccountId   uint64
-	ToAccountId     uint64
+	Id                uint64          `json:"transactionId"`
+	Amount            float64         `json:"amount"`
+	TransactionType   TransactionType `json:"transactionType"`
+	Description       string          `json:"description"`
+	ReceiverAccountId uint64          `json:"receiverAccountId"`
+	SenderAccountId   uint64          `json:"senderAccountId"`
+	CreatedAt         string          `json:"createdAt,omitempty"`
 }
 
 type TransactionType int

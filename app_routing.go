@@ -10,6 +10,11 @@ import (
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
 
+/*
+To initialize the routes and database connection you must
+include the following information as strings and also
+call Run setting the port to serve to the web.
+*/
 func (a *App) Initialize(host, port, user, password, dbname string) {
 	connectionStr := fmt.Sprintf(
 		"host=%s port=%v user=%s "+
@@ -19,43 +24,54 @@ func (a *App) Initialize(host, port, user, password, dbname string) {
 
 	var err error
 	a.DB, err = sql.Open("pgx", connectionStr)
-	if err != nil {
-		log.Fatal(err)
-	}
+	LogError(err)
 
 	a.Router = mux.NewRouter()
 
 	// Initializing routes
-	// a.InitAccountRoutes()
-	a.InitClientRoutes()
-	// a.InitTransactionRoutes()
+	a.initAccountRoutes()
+	a.initClientRoutes()
+	a.initTransactionRoutes()
+
+	// Creating tables if not exists
+	a.createTable(clientQuery)
+	a.createTable(accountQuery)
+	a.createTable(transactionQuery)
+
 	log.Println("API initialized!")
 }
 
-func (a *App) Run(p string) {
-	port := fmt.Sprintf(":%s", p)
-	log.Printf("Running at port: %s\n", p)
-	log.Fatal(http.ListenAndServe(port, a.Router))
+/*
+In order to run the application and serve it to the web
+add the port, eg: Run("3000").
+Don't include colons.
+*/
+func (a *App) Run(port string) {
+	log.Printf("Running at localhost:%s\n", port)
+	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), a.Router))
 }
 
-/* Initializing routes to retreive Client's data */
-func (a *App) InitClientRoutes() {
-	// a.Router.HandleFunc("/api/v1/client", a.GetClients).Methods("GET")
-	a.Router.HandleFunc("/api/v1/client/new", a.CreateClient).Methods("POST")
-	a.Router.HandleFunc("/api/v1/client/{id:[0-9]+}", a.GetClient).Methods("GET")
-	// a.Router.HandleFunc("/api/v1/client/{id:[0-9]+}", a.updateClient).Methods("PUT")    // Create flag
+/* Initializing routes to send/retreive Client's data. */
+func (a *App) initClientRoutes() {
+	a.Router.HandleFunc("/api/v1/clients/new", a.CreateClient).Methods("POST")            // done
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}", a.GetClient).Methods("GET") // done
 }
 
-/* Initializing routes to retreive Account's data */
-func (a *App) InitAccountRoutes() {
-	// a.Router.HandleFunc("/api/v1/account/{id:[0-9]+}", a.getAccount).Methods("GET")
-	// a.Router.HandleFunc("/api/v1/client/{id:[0-9]+}/account", a.getClientAccounts).Methods("GET")
-	// a.Router.HandleFunc("/api/v1/client/{id:[0-9]+}/account/create", a.createClientAccount).Methods("POST")
-	// a.Router.HandleFunc("/api/v1/client/{id:[0-9]+}/account/{id:[0-9]+}", a.getClientAccount).Methods("GET")
+/* Initializing routes to send/retreive Account's data. */
+func (a *App) initAccountRoutes() {
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts", a.GetAccounts).Methods("GET")
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/new", a.CreateAccount).Methods("POST")
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}", a.GetAccount).Methods("GET")
 }
 
-/* Initializing routes to retreive Transaction's data */
-func (a *App) InitTransactionRoutes() {
-	// a.Router.HandleFunc("/api/v1/account/{id:[0-9]+}/transaction", a.getTransactions).Methods("GET")
-	// a.Router.HandleFunc("/api/v1/account/{id:[0-9]+}/transaction/create", a.createTransaction).Methods("POST")
+/* Initializing routes to send/retreive Transaction's data. */
+func (a *App) initTransactionRoutes() {
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions", a.GetTransactions).Methods("GET")
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions/new", a.CreateTransaction).Methods("POST")
+}
+
+/* This function handles the creation of tables in DB. */
+func (a *App) createTable(query string) {
+	_, err := a.DB.Exec(query)
+	LogErrorMsg(err, "Error creating table.")
 }

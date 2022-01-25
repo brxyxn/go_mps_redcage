@@ -14,9 +14,9 @@ import (
 
 JSON Template:
 	{
-		"firstName": "Alexander",
-		"lastName": "Rodriguez",
-		"userName": "arodriguez"
+		"firstName": "John",
+		"lastName": "Doe",
+		"userName": "john.doe"
 	}
 
 */

@@ -4,52 +4,177 @@ This project was developed as required by Redcage as a technical test developing
 - [PostgreSQL 12.9](https://www.postgresql.org/download/)
 - [Docker 20.10.12](https://www.docker.com/get-started)
 
-## Methods
-|HTTP Method|URI Pattern |
-|---:|---|
-|POST|/api/v1/client/new|
-|GET|/api/v1/client/**{client_id}**|
-|POST|/api/v1/client/**{client_id}**/accounts/new|
-|GET|/api/v1/client/**{client_id}**/accounts/**{account_id}**|
-|POST|/api/v1/client/**{client_id}**/accounts/**{account_id}**/transactions/new|
-|GET|/api/v1/client/**{client_id}**/accounts/**{account_id}**/transactions|
+# Content
+1. [Getting Started](#getting-started)  
+	- [Source Code](#source-code)
+	- [Initializing The App](#initializing-the-app)
+	- [Methods](#methods)
+		- [Create a new client](#create-a-new-client)
+		- [Create a new account](#create-a-new-account)
+		- [Create a new transaction](#create-a-new-transaction)
+	- [Database](#database)
+2. [What's Next](#whats-next)
+
+
+
+
 
 # Getting Started
 ## Source Code
 Clone the repository to your local environment.
 
-### HTTPS
+> HTTPS
 ```bash
 git clone https://github.com/brxyxn/go_mps_redcage.git
 ```
-### SSH
+> SSH
 ```bash
 git clone git@github.com:brxyxn/go_mps_redcage.git
 ```
-### GitHub CLI
+> GitHub CLI
 ```bash
 gh repo clone brxyxn/go_mps_redcage
 ```
 
-## Running The App
+## Initializing The App
+> Move into the code directory
+```bash
+cd go_mps_redcage
+```
+
+> Verify Dependencies
+Now you need to verify the 
+```bash
+go mod tidy
+# Note: If no errors are returned, move to the next step.
+go mod verify
+# Output: all modules verified
+```
+
+> Run
 ```bash
 go run .
-```
-```bash
+# or
 go run main.go
+# Output:
+# 2022/01/25 12:57:22 API initialized!
+# 2022/01/25 12:57:22 Running at localhost:5000
 ```
-After running the app you will see the output showing that the app is initialized and running.
-```bash
-# Output
-2022/01/25 12:57:22 API initialized!
-2022/01/25 12:57:22 Running at localhost:5000
+> After running the app you will see the output showing that the app is initialized and running.
+>
+> If the tables not exist in the database the app will automatically create them. Refer below to see the schema.
+
+## Methods
+|HTTP Method|URI Pattern |
+|---:|---|
+|POST|/api/v1/client/new|
+|GET |/api/v1/clients/**{client_id}**|
+|POST|/api/v1/clients/**{client_id}**/accounts/new|
+|GET |/api/v1/clients/**{client_id}**/accounts/**{account_id}**|
+|POST|/api/v1/clients/**{client_id}**/accounts/**{account_id}**/transactions/new|
+|GET |/api/v1/clients/**{client_id}**/accounts/**{account_id}**/transactions|
+
+### Create a new client
+> /api/v1/clients/**new**
+
+Accepted fields:
+- firstName as **string**.
+- lastName as **string**.
+- username as **string**.
+
+``` json
+{
+	"firstName": "John",
+	"lastName": "Doe",
+	"username": "john.doe"
+}
 ```
-If the tables not exist in the database the app will automatically create them. Refer below to see the schema.
+
+### Create a new account
+> /api/v1/clients/*1*/accounts/**new**
+
+Accepted fields:
+- balance as **numeric(13,2)**.  
+- currency codes as **string**:
+  - USD
+  - MXN
+  - COP
+- accountType as **string**:
+  - Savings
+  - Checking
+  - Credit Card
+
+For more details about currency symbols and codes check [this link.](https://www.xe.com/symbols.php)
+
+```json
+{
+	"balance": 80000.00,
+	"currency": "USD",
+	"accountType": "Savings"
+}
+```
+```json
+{
+	"balance": 25000.00,
+	"currency": "MXN",
+	"accountType": "Checking"
+}
+```
+```json
+{
+	"balance": 65000.00,
+	"currency": "COP",
+	"accountType": "Credit Card"
+}
+
+```
+### Create a new transaction
+> /api/v1/clients/*5*/accounts/*8*/transactions/**new** 
+
+Accepted fields:
+- amount as **numeric(13,2)**.  
+- transactionType as **integer**:
+  - 1 -> Deposit
+  - 2 -> Withdraw
+  - 3 -> Transfer
+- description as **string**.  
+- receiverAccountId as **integer**.  
+- senderAccountId as **integer**.
 
 
+>If the value for senderAccountId is not set, by default will be 0 which means the transaction is either a deposit or a withdraw.
+
+```json
+{
+	"amount": 100.00,
+	"transactionType": 1,
+	"description": "This is a deposit",
+	"receiverAccountId": 1,
+	"senderAccountId": 0
+}
+```
+```json
+{
+	"amount": 120.00,
+	"transactionType": 2,
+	"description": "This is a withdraw",
+	"receiverAccountId": 2,
+	"senderAccountId": 0
+}
+```
+```json
+{
+	"amount": 100.00,
+	"transactionType": 3,
+	"description": "This is a transfer or EFT",
+	"receiverAccountId": 2,
+	"senderAccountId": 1
+}
+```
 
 ## Database
-This is the final database schema, remember to update the public schema when deployed to production.
+> This is the final database schema, remember to update the public schema when deployed to production.  
+> You can either run the script manually into the database or let the API do it for you.
 
 ```sql
 CREATE TABLE IF NOT EXISTS public.client (
@@ -92,10 +217,9 @@ CREATE TABLE IF NOT EXISTS public."transaction" (
 
 ```
 
-
+Entities
 
 ---
-
 
 # What's next?
 For the following development and releases there are some ideas of what could be implemented, eg: creating a profile for clients where additional "real-life" information is collected.
@@ -135,3 +259,5 @@ type Address struct {
 	ClientId       uint64 `json:"clientId"`
 }
 ```
+
+Additionally there are some improvements based on the "ficitious" client's requirement.

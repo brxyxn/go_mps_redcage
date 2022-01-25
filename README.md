@@ -4,9 +4,13 @@ This project was developed as required by Redcage as a technical test developing
 - [PostgreSQL 12.9](https://www.postgresql.org/download/)
 - [Docker 20.10.12](https://www.docker.com/get-started)
 
+> Important Note: this project won't accept Pull Requests, however, you can use it as reference if need it to build your own project.
+
+---
 # Content
 1. [Getting Started](#getting-started)  
 	- [Source Code](#source-code)
+	- [Setting Database Connection](#setting-database-connection)
 	- [Initializing The App](#initializing-the-app)
 	- [Methods](#methods)
 		- [Create a new client](#create-a-new-client)
@@ -15,7 +19,7 @@ This project was developed as required by Redcage as a technical test developing
 	- [Database](#database)
 2. [What's Next](#whats-next)
 
-
+---
 
 
 
@@ -34,6 +38,16 @@ git clone git@github.com:brxyxn/go_mps_redcage.git
 > GitHub CLI
 ```bash
 gh repo clone brxyxn/go_mps_redcage
+```
+
+## Setting Database Connection
+You need to create a local file `.env` with the following information:
+```.env
+DEV_DB_HOST={YOUR_HOST}
+DEV_DB_PORT={YOUR_PORT}
+DEV_DB_USERNAME={YOUR_USERNAME}
+DEV_DB_PASSWORD={YOUR_PASSWORD}
+DEV_DB_NAME={YOUR_DB_NAME}
 ```
 
 ## Initializing The App

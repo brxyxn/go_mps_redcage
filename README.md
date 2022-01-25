@@ -50,6 +50,8 @@ DEV_DB_PASSWORD={YOUR_PASSWORD}
 DEV_DB_NAME={YOUR_DB_NAME}
 ```
 
+Take into consideration that the information will be needed and you can use the file `.env_template` as a reference.
+
 ## Initializing The App
 > Move into the code directory
 ```bash

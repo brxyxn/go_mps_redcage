@@ -3,12 +3,17 @@ This project was developed as required by Redcage as a technical test developing
 - [Golang 1.16](https://go.dev/dl/)
 - [PostgreSQL 12.9](https://www.postgresql.org/download/)
 - [Docker 20.10.12](https://www.docker.com/get-started)
+- [Docker Compose 1.29.2](https://docs.docker.com/compose/)
+- [ElephantSQL](https://www.elephantsql.com)
 
 > Important Note: this project won't accept Pull Requests, however, you can use it as reference if need it to build your own project.
 
 ---
 # Content
-1. [Getting Started](#getting-started)  
+1. [Getting Started](#getting-started)
+	- [Docker](#docker)
+		- [Pull repository](#pull-repository)
+		- [Versions](#versions)
 	- [Source Code](#source-code)
 	- [Setting Database Connection](#setting-database-connection)
 	- [Initializing The App](#initializing-the-app)
@@ -18,12 +23,28 @@ This project was developed as required by Redcage as a technical test developing
 		- [Create a new transaction](#create-a-new-transaction)
 	- [Database](#database)
 2. [What's Next](#whats-next)
-
 ---
 
+# Links
+<p style="display: flex;flex-direction: row;">
+<a href="https://hub.docker.com/repository/docker/brxyxn/go_mps_redcage"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Docker_%28container_engine%29_logo.svg" alt="Docker repository" height="50"></a>
+
+<a href="https://hub.docker.com/repository/docker/brxyxn/go_mps_redcage"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Docker repository" height="50"></a>
+</p>
 
 
 # Getting Started
+## Docker
+### Pull repository
+```bash
+docker pull brxyxn/go_mps_redcage:latest
+```
+```bash
+docker pull brxyxn/go_mps_redcage:dockerized
+```
+### Versions
+The `latest` version works with ElephantSQL which is an online platform to connect our PostgreSQL database. However, you can still set up the `dockerized` tag but you must configure the PostgreSQL image locally to be able to run it.
+
 ## Source Code
 Clone the repository to your local environment.
 
@@ -78,7 +99,7 @@ go run main.go
 ```
 > After running the app you will see the output showing that the app is initialized and running.
 >
-> If the tables not exist in the database the app will automatically create them. Refer below to see the schema.
+> If the tables do not exist in the database the app will automatically create them. Refer below to see the schema.
 
 ## Methods
 |HTTP Method|URI Pattern |
@@ -158,7 +179,7 @@ Accepted fields:
 - senderAccountId as **integer**.
 
 
->If the value for senderAccountId is not set, by default will be 0 which means the transaction is either a deposit or a withdraw.
+>If the value for senderAccountId is not set, by default will be 0 which means the transaction is either a deposit or a withdrawal.
 
 ```json
 {
@@ -275,4 +296,4 @@ type Address struct {
 }
 ```
 
-> Additionally there are some improvements based on the "ficitious" client's requirement, however, those might be covered at another time.
+> Additionally there are some improvements based on the "fictitious" client's requirement, however, those might be covered at another time.

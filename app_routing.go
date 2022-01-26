@@ -16,6 +16,8 @@ include the following information as strings and also
 call Run setting the port to serve to the web.
 */
 func (a *App) Initialize(host, port, user, password, dbname string) {
+
+	// connectionStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, port, dbname)
 	connectionStr := fmt.Sprintf(
 		"host=%s port=%v user=%s "+
 			"password=%s dbname=%s sslmode=disable",
@@ -29,14 +31,7 @@ func (a *App) Initialize(host, port, user, password, dbname string) {
 	a.Router = mux.NewRouter()
 
 	// Initializing routes
-	a.initAccountRoutes()
-	a.initClientRoutes()
-	a.initTransactionRoutes()
-
-	// Creating tables if not exists
-	a.createTable(clientQuery)
-	a.createTable(accountQuery)
-	a.createTable(transactionQuery)
+	a.initRoutes()
 
 	log.Println("API initialized!")
 }
@@ -51,27 +46,25 @@ func (a *App) Run(port string) {
 	log.Fatal(http.ListenAndServe(fmt.Sprintf(":%s", port), a.Router))
 }
 
-/* Initializing routes to send/retreive Client's data. */
-func (a *App) initClientRoutes() {
+func (a *App) initRoutes() {
 	a.Router.HandleFunc("/api/v1/clients/new", a.CreateClient).Methods("POST")            // done
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}", a.GetClient).Methods("GET") // done
-}
 
-/* Initializing routes to send/retreive Account's data. */
-func (a *App) initAccountRoutes() {
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts", a.GetAccounts).Methods("GET")
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/new", a.CreateAccount).Methods("POST")
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}", a.GetAccount).Methods("GET")
-}
 
-/* Initializing routes to send/retreive Transaction's data. */
-func (a *App) initTransactionRoutes() {
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions", a.GetTransactions).Methods("GET")
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions/new", a.CreateTransaction).Methods("POST")
 }
 
 /* This function handles the creation of tables in DB. */
-func (a *App) createTable(query string) {
-	_, err := a.DB.Exec(query)
-	LogErrorMsg(err, "Error creating table.")
-}
+// func (a *App) createTable(query string) {
+// 	_, err := a.DB.Exec(query)
+// 	LogErrorMsg(err, "Error creating table.")
+// }
+
+// func (a *App) seedTables(query string) {
+// 	_, err := a.DB.Exec(query)
+// 	LogErrorMsg(err, "Error seeding tables.")
+// }

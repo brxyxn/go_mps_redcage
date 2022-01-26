@@ -5,7 +5,7 @@ import (
 	"log"
 )
 
-var clientQuery = `CREATE TABLE IF NOT EXISTS public.client (
+var ClientQuery = `CREATE TABLE IF NOT EXISTS public.client (
 	id bigint NOT NULL GENERATED ALWAYS AS IDENTITY,
 	firstname varchar NOT NULL,
 	lastname varchar NOT NULL,

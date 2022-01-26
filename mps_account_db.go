@@ -5,7 +5,7 @@ import (
 	"errors"
 )
 
-var accountQuery = `CREATE TABLE IF NOT EXISTS public.account (
+var AccountQuery = `CREATE TABLE IF NOT EXISTS public.account (
 	id integer NOT NULL GENERATED ALWAYS AS IDENTITY,
 	balance numeric(13,2) NOT NULL,
 	currency varchar NOT NULL,

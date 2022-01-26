@@ -42,12 +42,13 @@ gh repo clone brxyxn/go_mps_redcage
 
 ## Setting Database Connection
 You need to create a local file `.env` with the following information:
-```.env
-DEV_DB_HOST={YOUR_HOST}
-DEV_DB_PORT={YOUR_PORT}
-DEV_DB_USERNAME={YOUR_USERNAME}
-DEV_DB_PASSWORD={YOUR_PASSWORD}
-DEV_DB_NAME={YOUR_DB_NAME}
+```sh
+DB_HOST={your_host}
+DB_DRIVER={pgx}
+DB_USER={your_user}
+DB_PASSWORD={your_password}
+DB_NAME={backend_db}
+DB_PORT={5432}
 ```
 
 Take into consideration that the information will be needed and you can use the file `.env_template` as a reference.
@@ -58,8 +59,7 @@ Take into consideration that the information will be needed and you can use the 
 cd go_mps_redcage
 ```
 
-> Verify Dependencies
-Now you need to verify the 
+> Verify dependencies
 ```bash
 go mod tidy
 # Note: If no errors are returned, move to the next step.
@@ -232,8 +232,7 @@ CREATE TABLE IF NOT EXISTS public."transaction" (
 );
 
 ```
-
-Entities
+> A SQL file is included with dummy data to get easy to start working with the API, you could start creating transactions which is the main target of this project.
 
 ---
 
@@ -276,4 +275,4 @@ type Address struct {
 }
 ```
 
-Additionally there are some improvements based on the "ficitious" client's requirement.
+> Additionally there are some improvements based on the "ficitious" client's requirement, however, those might be covered at another time.

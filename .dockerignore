@@ -1,0 +1,10 @@
+# git
+.git
+.gitattributes
+.gitignore
+
+# templates
+.env_template
+
+# others
+docs

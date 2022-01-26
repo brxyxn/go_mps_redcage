@@ -6,7 +6,7 @@ import (
 	"log"
 )
 
-var transactionQuery = `CREATE TABLE IF NOT EXISTS public."transaction" (
+var TransactionQuery = `CREATE TABLE IF NOT EXISTS public."transaction" (
 	id integer NOT NULL GENERATED ALWAYS AS IDENTITY,
 	amount numeric(13,2) NOT NULL,
 	transaction_type smallint NOT NULL,

@@ -10,7 +10,8 @@ This project was developed as required by Redcage as a technical test developing
 
 ---
 # Content
-1. [Getting Started](#getting-started)
+1. [Links](#links)
+2. [Getting Started](#getting-started)
 	- [Docker](#docker)
 		- [Pull repository](#pull-repository)
 		- [Versions](#versions)
@@ -22,7 +23,7 @@ This project was developed as required by Redcage as a technical test developing
 		- [Create a new account](#create-a-new-account)
 		- [Create a new transaction](#create-a-new-transaction)
 	- [Database](#database)
-2. [What's Next](#whats-next)
+3. [What's Next](#whats-next)
 ---
 
 # Links

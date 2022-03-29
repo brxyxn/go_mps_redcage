@@ -1,45 +1,31 @@
 package main
 
 import (
-	"io/ioutil"
+	"flag"
 	"log"
 	"os"
 
-	"github.com/joho/godotenv"
+	u "github.com/brxyxn/go_mps_redcage/utils"
 )
 
+var bindAddress = flag.String("BIND_ADDRESS", ":3000", "Bind address for the server")
+
 func main() {
+	flag.Parse()
+
 	a := App{}
 
+	a.l = log.New(os.Stdout, "go-mps-api ", log.LstdFlags)
+
+	a.bindAddr = *bindAddress
+
 	a.Initialize(
-		dotEnvGet("DB_HOST"),
-		dotEnvGet("DB_PORT"),
-		dotEnvGet("DB_USER"),
-		dotEnvGet("DB_PASSWORD"),
-		dotEnvGet("DB_NAME"),
+		u.DotEnvGet("DB_HOST"),
+		u.DotEnvGet("DB_PORT"),
+		u.DotEnvGet("DB_USER"),
+		u.DotEnvGet("DB_PASSWORD"),
+		u.DotEnvGet("DB_NAME"),
 	)
 
-	// We try to validate that the connection to the DB is correct, otherwise, the app
-	// will restart, this is a temporary solution because the postgres image usually
-	// is initialized after golang's image.
-	if err := a.DB.Ping(); err != nil {
-		a.DB.Close()
-		log.Fatal(err)
-	} else {
-		// Executing SQL statements to create tables and seed DB.
-		query, err := ioutil.ReadFile("docker_postgres_init.sql")
-		LogErrorMsg(err, "Error while reading ./docker_postgres_init.sql file")
-		if _, err := a.DB.Exec(string(query)); err != nil {
-			panic(err)
-		}
-	}
-
-	a.Run("8080")
-}
-
-func dotEnvGet(key string) string {
-	err := godotenv.Load()
-	LogErrorMsg(err, "Error loading .env file.")
-
-	return os.Getenv(key)
+	a.Run()
 }

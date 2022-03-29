@@ -1,0 +1,259 @@
+basePath: /api/v1
+consumes:
+- application/json
+definitions:
+  Account:
+    properties:
+      accountId:
+        format: uint64
+        type: integer
+        x-go-name: Id
+      accountType:
+        $ref: '#/definitions/AccountType'
+      active:
+        type: boolean
+        x-go-name: Active
+      balance:
+        type: string
+        x-go-name: Balance
+      clientId:
+        format: uint64
+        type: integer
+        x-go-name: ClientId
+      createdAt:
+        type: string
+        x-go-name: CreatedAt
+      currency:
+        type: string
+        x-go-name: Currency
+    type: object
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+  AccountType:
+    type: string
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+  Accounts:
+    items:
+      $ref: '#/definitions/Account'
+    type: array
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+  Client:
+    description: Product defines the structure for an API client
+    properties:
+      active:
+        description: The status for the client, instead of deletion you change the
+          status of the client
+        type: boolean
+        x-go-name: Active
+      clientId:
+        description: The id of the product
+        format: uint64
+        type: integer
+        x-go-name: Id
+      createdAt:
+        description: Timestamp automatically included when the user is created
+        type: string
+        x-go-name: CreatedAt
+      firstName:
+        description: The firstname for the client
+        type: string
+        x-go-name: Firstname
+      lastName:
+        description: The lastname for the client
+        type: string
+        x-go-name: Lastname
+      username:
+        description: The username for the client
+        type: string
+        x-go-name: Username
+    required:
+    - firstName
+    - lastName
+    - username
+    type: object
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+  GenericError:
+    description: Generic Error is a generic error message returned by a server
+    properties:
+      message:
+        type: string
+        x-go-name: Message
+    type: object
+    x-go-package: github.com/brxyxn/go_mps_redcage/docs
+  Transaction:
+    properties:
+      amount:
+        format: double
+        type: number
+        x-go-name: Amount
+      createdAt:
+        type: string
+        x-go-name: CreatedAt
+      description:
+        type: string
+        x-go-name: Description
+      receiverAccountId:
+        format: uint64
+        type: integer
+        x-go-name: ReceiverAccountId
+      senderAccountId:
+        format: uint64
+        type: integer
+        x-go-name: SenderAccountId
+      transactionId:
+        format: uint64
+        type: integer
+        x-go-name: Id
+      transactionType:
+        $ref: '#/definitions/TransactionType'
+    type: object
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+  TransactionType:
+    format: int64
+    type: integer
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+  Transactions:
+    items:
+      $ref: '#/definitions/Transaction'
+    type: array
+    x-go-package: github.com/brxyxn/go_mps_redcage/data
+info:
+  description: Documentation Money Processing Service API
+  title: Money Processing Service
+  version: 2.0.0
+paths:
+  /clients:
+    post:
+      description: Return the id of the new client including the details of it
+      operationId: createClient
+      responses:
+        "201":
+          $ref: '#/responses/clientResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "500":
+          $ref: '#/responses/internalErrorResponse'
+      tags:
+      - clients
+  /clients/{client_id}:
+    get:
+      description: Return the details of one client registry
+      operationId: getClient
+      responses:
+        "200":
+          $ref: '#/responses/clientResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "404":
+          $ref: '#/responses/notFoundErrorResponse'
+        "500":
+          $ref: '#/responses/internalErrorResponse'
+      tags:
+      - clients
+  /clients/{client_id}/accounts/:
+    get:
+      description: Return a list of the accounts listed by the {client_id}
+      operationId: getAccounts
+      responses:
+        "200":
+          $ref: '#/responses/accountsResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "404":
+          $ref: '#/responses/notFoundErrorResponse'
+      tags:
+      - accounts
+  /clients/{client_id}/accounts/{account_id}:
+    get:
+      description: Return the id of the new client
+      operationId: getAccount
+      responses:
+        "200":
+          $ref: '#/responses/accountResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "404":
+          $ref: '#/responses/notFoundErrorResponse'
+        "500":
+          $ref: '#/responses/internalErrorResponse'
+      tags:
+      - accounts
+  /clients/{client_id}/accounts/{account_id}/transactions:
+    get:
+      description: Return a list of the accounts listed by the {account_id}
+      operationId: getTransactions
+      responses:
+        "200":
+          $ref: '#/responses/transactionsResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "404":
+          $ref: '#/responses/notFoundErrorResponse'
+      tags:
+      - transactions
+    post:
+      description: Return the id of the new transaction including the details of it
+      operationId: createTransaction
+      responses:
+        "201":
+          $ref: '#/responses/transactionResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "500":
+          $ref: '#/responses/internalErrorResponse'
+      tags:
+      - transactions
+  /clients/{client_id}/accounts/new:
+    post:
+      description: Return the id of the new account including the details of it
+      operationId: createAccount
+      responses:
+        "201":
+          $ref: '#/responses/accountResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "500":
+          $ref: '#/responses/internalErrorResponse'
+      tags:
+      - accounts
+produces:
+- application/json
+responses:
+  accountResponse:
+    description: Created item returns the details of the account
+    schema:
+      $ref: '#/definitions/Account'
+  accountsResponse:
+    description: Data structure representing a list of accounts
+    schema:
+      $ref: '#/definitions/Accounts'
+  badRequestErrorResponse:
+    description: Bad Request Error Response
+    schema:
+      $ref: '#/definitions/GenericError'
+  clientResponse:
+    description: Created item returns the details of the client
+    schema:
+      $ref: '#/definitions/Client'
+  errorResponse:
+    description: Generic error message returned as a string
+    schema:
+      $ref: '#/definitions/GenericError'
+  internalErrorResponse:
+    description: Internal Error Response
+    schema:
+      $ref: '#/definitions/GenericError'
+  notFoundErrorResponse:
+    description: Not Found Error Response
+    schema:
+      $ref: '#/definitions/GenericError'
+  transactionResponse:
+    description: Created item returns the details of the transaction
+    schema:
+      $ref: '#/definitions/Transaction'
+  transactionsResponse:
+    description: Data structure representing a list of transactions
+    schema:
+      $ref: '#/definitions/Transactions'
+schemes:
+- http
+swagger: "2.0"

@@ -12,38 +12,14 @@ import (
 )
 
 /*
-	/api/v1/clients/{client_id}/accounts/new
+swagger:route POST /clients/{client_id}/accounts/new accounts createAccount
+Return the id of the new account including the details of it
+responses:
+	201: accountResponse
+	400: badRequestErrorResponse
+	500: internalErrorResponse
 
-JSON Template:
-	"COP & Savings"
-	{
-		"balance": 80000.00,
-		"currency": "COP",
-		"accountType": "Savings"
-	}
-
-	"USD & Checking"
-	{
-		"balance": 25000.00,
-		"currency": "USD",
-		"accountType": "Checking"
-	}
-
-	"MXN & CreditCard"
-	{
-		"balance": 65000.00,
-		"currency": "MXN",
-		"accountType": "Credit Card"
-	}
-
-
-"accountId"`
-    Balance     float64     `json:"balance"`
-    Currency    string      `json:"currency"`
-    AccountType AccountType `json:"accountType"`
-    Active      bool        `json:"active,omitempty"`
-    ClientId    uint64      `json:"clientId"`
-    CreatedAt   string      `json:"createdAt,omitempty"`
+CreateAccount handles POST request and returns the AccountID of the new Account
 */
 func (a *Handlers) CreateAccount(w http.ResponseWriter, r *http.Request) {
 	a.l.Println("Handling POST Accounts /clients/:id/accounts/new")
@@ -74,10 +50,15 @@ func (a *Handlers) CreateAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-	/api/v1/clients/{client_id}/accounts/{account_id}
+swagger:route GET /clients/{client_id}/accounts/{account_id} accounts getAccount
+Return the id of the new client
+responses:
+	200: accountResponse
+	400: badRequestErrorResponse
+	404: notFoundErrorResponse
+	500: internalErrorResponse
 
-This function returns the information of an account based on the {account_id}.
-
+GetAccount handles GET requests and returns the details of the requested Account
 **{client_id} should be replaced by an authentication token (JWT) and validated with middleware.
 */
 func (a *Handlers) GetAccount(w http.ResponseWriter, r *http.Request) {
@@ -107,9 +88,15 @@ func (a *Handlers) GetAccount(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-	/api/v1/clients/{client_id}/accounts
+swagger:route GET /clients/{client_id}/accounts/ accounts getAccounts
+Return a list of the accounts listed by the {client_id}
+responses:
+	200: accountsResponse
+	400: badRequestErrorResponse
+	404: notFoundErrorResponse
 
-This function returns a list of accounts owned by the {client_id}.
+GetAccounts handles GET requests and returns a list of the accounts listed by a client
+**{client_id} should be replaced by an authentication token (JWT) and validated with middleware.
 */
 func (a *Handlers) GetAccounts(w http.ResponseWriter, r *http.Request) {
 	a.l.Println("Handling GET Accounts")

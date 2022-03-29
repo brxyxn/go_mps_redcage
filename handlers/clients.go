@@ -12,15 +12,14 @@ import (
 )
 
 /*
-	/api/v1/clients/new
+swagger:route POST /clients clients createClient
+Return the id of the new client including the details of it
+responses:
+	201: clientResponse
+	400: badRequestErrorResponse
+	500: internalErrorResponse
 
-JSON Template:
-	{
-		"firstName": "John",
-		"lastName": "Doe",
-		"userName": "john.doe"
-	}
-
+CreateClient handles POST request and returns the ClientID of the new Client
 */
 func (c *Handlers) CreateClient(w http.ResponseWriter, r *http.Request) {
 	c.l.Println("Handle POST Clients")
@@ -48,9 +47,15 @@ func (c *Handlers) CreateClient(w http.ResponseWriter, r *http.Request) {
 }
 
 /*
-	/api/v1/clients/{client_id}
+swagger:route GET /clients/{client_id} clients getClient
+Return the details of one client registry
+responses:
+	200: clientResponse
+	400: badRequestErrorResponse
+	404: notFoundErrorResponse
+	500: internalErrorResponse
 
-This function returns the information of a client based on the {client_id}.
+GetClient handles GET requests and returns the details of the requested Client
 */
 func (c *Handlers) GetClient(w http.ResponseWriter, r *http.Request) {
 	c.l.Println("Handling GET Clients")

@@ -11,14 +11,32 @@ import (
 
 type Accounts []Account
 
+/*
+Account structure for the API
+swagger:model
+*/
 type Account struct {
-	Id          uint64      `json:"accountId"`
-	Balance     string      `json:"balance"`
-	Currency    string      `json:"currency"`
+	// The id of the account
+	// required: false
+	Id uint64 `json:"accountId"`
+	// The current balance of the account
+	// required: true
+	Balance string `json:"balance"`
+	// The currency symbol or description of the account - USD, MXN, COP
+	// required: true
+	Currency string `json:"currency"`
+	// The account type - checking, savings, credit card
+	// required: true
 	AccountType AccountType `json:"accountType"`
-	Active      bool        `json:"active,omitempty"`
-	ClientId    uint64      `json:"clientId"`
-	CreatedAt   string      `json:"createdAt,omitempty"`
+	// The status of the account, instead of deletion you change the status of the account
+	// required: true
+	Active bool `json:"active,omitempty"`
+	// The ClientId is considered the FK of this model
+	// required: true
+	ClientId uint64 `json:"clientId"`
+	// Timestamp automatically included when the transaction is created
+	// required: false
+	CreatedAt string `json:"createdAt,omitempty"`
 }
 
 type AccountType string

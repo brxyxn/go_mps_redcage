@@ -2,8 +2,9 @@ package data
 
 import (
 	"database/sql"
-	"errors"
 	"log"
+
+	"github.com/shopspring/decimal"
 )
 
 /*
@@ -12,14 +13,32 @@ import (
 
 type Transactions []Transaction
 
+/*
+Transaction structure for the API
+swagger:model
+*/
 type Transaction struct {
-	Id                uint64          `json:"transactionId"`
-	Amount            float64         `json:"amount"`
-	TransactionType   TransactionType `json:"transactionType"`
-	Description       string          `json:"description"`
-	ReceiverAccountId uint64          `json:"receiverAccountId"`
-	SenderAccountId   uint64          `json:"senderAccountId"`
-	CreatedAt         string          `json:"createdAt,omitempty"`
+	// The Id of the transaction
+	// required: false
+	Id uint64 `json:"transactionId"`
+	// The transaction amount
+	// required: true
+	Amount string `json:"amount"`
+	// The transaction type - withdraw, deposit, transfer
+	// required: true
+	TransactionType TransactionType `json:"transactionType"`
+	// The description of the transaction
+	// required: true
+	Description string `json:"description"`
+	// The account number/id of the receiver or affected account
+	// required: true
+	ReceiverAccountId uint64 `json:"receiverAccountId"`
+	// The account number/id of the sender account if it's a transfer of funds
+	// required: true
+	SenderAccountId uint64 `json:"senderAccountId"`
+	// Timestamp automatically included when the transaction is created
+	// required: false
+	CreatedAt string `json:"createdAt,omitempty"`
 }
 
 type TransactionType int
@@ -72,72 +91,6 @@ func GetTransactions(db *sql.DB, accountId int) (Transactions, error) {
 }
 
 /*
-This function validates the type of transaction that is requested
-and perform the addition or substaction needed into the account's
-table and creates the transaction registry.
-*/
-func CreateTransaction(db *sql.DB, p *Transaction) error {
-	// Validate what type of transaction is being performed and process the request.
-	switch p.TransactionType {
-	case DictTransactionType.Deposit:
-		// When a deposit is processed the account balance is updated
-		oldBalance, _, err := getBalanceAccount(db, p, p.ReceiverAccountId)
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-
-		// Deposit represents an addition
-		newBalance := oldBalance + p.Amount
-
-		// Update Account
-		updateAccount(db, p, newBalance)
-		registerTransaction(db, p)
-		return nil
-
-	case DictTransactionType.Withdraw:
-		// When a withdraw is processed the account balance is updated
-		oldBalance, _, err := getBalanceAccount(db, p, p.ReceiverAccountId)
-		if err != nil {
-			log.Fatal(err)
-			return err
-		}
-
-		// Deposit represents an substraction
-		newBalance := oldBalance - p.Amount
-
-		// Updating Account
-		updateAccount(db, p, newBalance)
-		err = registerTransaction(db, p)
-		return err
-
-	case DictTransactionType.Transfer:
-		oldBalanceSenderAccount, currencySender, err := getBalanceAccount(db, p, p.SenderAccountId)
-		if err != nil {
-			log.Println(err)
-			return err
-		}
-		oldBalanceReciverAccount, currencyReceiver, err := getBalanceAccount(db, p, p.ReceiverAccountId)
-		if err != nil {
-			log.Println(err)
-			return err
-		}
-		if currencySender != currencyReceiver {
-			log.Println("Currencies don't match.")
-			return errors.New("currencies don't match")
-		}
-
-		newBalanceSenderAccount := oldBalanceSenderAccount - p.Amount
-		newBalanceReceiverAccount := oldBalanceReciverAccount + p.Amount
-
-		updateAccountsOnTransfer(db, p, newBalanceSenderAccount, newBalanceReceiverAccount)
-		registerTransaction(db, p)
-	}
-
-	return nil
-}
-
-/*
 -----------------------------------------------------------------------
 Splitted responsibility making this code look clean and understandable.
 -----------------------------------------------------------------------
@@ -147,7 +100,7 @@ Splitted responsibility making this code look clean and understandable.
 Used this function to register/insert the new registry when a
 DEPOSIT, WITHDRAW or TRANSFER transaction is processed.
 */
-func registerTransaction(db *sql.DB, p *Transaction) error {
+func RegisterTransaction(db *sql.DB, p *Transaction) error {
 	return db.QueryRow(
 		"INSERT INTO public.transactions(amount, transaction_type, description, receiver_account_id, sender_account_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
 		&p.Amount, &p.TransactionType, &p.Description, &p.ReceiverAccountId, &p.SenderAccountId,
@@ -160,10 +113,10 @@ With this function you can request the OLD_BALANCE stored in the account.
 The balance will be calculated based on two params: ACCOUNT_BALANCE & CURRENCY.
 These params are returned to the main function to be validated.
 */
-func getBalanceAccount(db *sql.DB, p *Transaction, accountId uint64) (accountBalance float64, currency string, err error) {
+func GetBalanceAccount(db *sql.DB, accountId uint64) (accountBalance string, currency string, err error) {
 	err = db.QueryRow(
 		"SELECT balance, currency FROM public.accounts WHERE id=$1",
-		&p.ReceiverAccountId,
+		&accountId,
 	).Scan(&accountBalance, &currency)
 
 	return accountBalance, currency, err
@@ -175,7 +128,7 @@ is processed. New balance is calculated before the amount field is updated.
 
 This functions panics if there is any error while processing the update.
 */
-func updateAccount(db *sql.DB, p *Transaction, newBalance float64) {
+func UpdateAccount(db *sql.DB, p *Transaction, newBalance decimal.Decimal) {
 	if _, err := db.Exec(
 		"UPDATE public.accounts SET balance=$1 WHERE id=$2;",
 		newBalance, &p.ReceiverAccountId,
@@ -188,9 +141,9 @@ func updateAccount(db *sql.DB, p *Transaction, newBalance float64) {
 Used this function to update accounts' amount when a TRANSFER (EFT) event
 is processed. New balance is calculated before the amount field is updated.
 */
-func updateAccountsOnTransfer(db *sql.DB, p *Transaction, balanceSender, balanceReceiver float64) error {
+func UpdateAccountsOnTransfer(db *sql.DB, p *Transaction, balanceSender, balanceReceiver decimal.Decimal) error {
 	_, err := db.Exec(
-		"UPDATE public.account SET balance=$1 WHERE id=$2",
+		"UPDATE public.accounts SET balance=$1 WHERE id=$2",
 		&balanceSender, &p.SenderAccountId,
 	)
 	if err != nil {
@@ -198,7 +151,7 @@ func updateAccountsOnTransfer(db *sql.DB, p *Transaction, balanceSender, balance
 	}
 
 	_, err = db.Exec(
-		"UPDATE public.account SET balance=$1 WHERE id=$2",
+		"UPDATE public.accounts SET balance=$1 WHERE id=$2",
 		&balanceReceiver, &p.ReceiverAccountId,
 	)
 	if err != nil {

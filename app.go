@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/brxyxn/go_mps_redcage/handlers"
+	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
 )
@@ -26,17 +27,23 @@ type App struct {
 func (a *App) InitRoutes() {
 	h := handlers.NewHandlers(a.db, a.l)
 	// Client routes
-	a.Router.HandleFunc("/api/v1/clients/new", h.CreateClient).Methods("POST")
+	a.Router.HandleFunc("/api/v1/clients", h.CreateClient).Methods("POST")
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}", h.GetClient).Methods("GET")
 
 	// Account routes
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts", h.GetAccounts).Methods("GET")
-	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/new", h.CreateAccount).Methods("POST")
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts", h.CreateAccount).Methods("POST")
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}", h.GetAccount).Methods("GET")
 
 	// Transaction routes
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions", h.GetTransactions).Methods("GET")
-	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions/new", h.CreateTransaction).Methods("POST")
+	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions", h.CreateTransaction).Methods("POST")
+
+	opts := middleware.RedocOpts{SpecURL: "/docs/swagger.yaml"}
+	sh := middleware.Redoc(opts, nil)
+
+	a.Router.Handle("/docs", sh)
+	a.Router.Handle("/docs/swagger.yaml", http.FileServer(http.Dir("./")))
 }
 
 /*
@@ -104,7 +111,7 @@ func (a *App) Run() {
 
 	// Starting the server
 	go func() {
-		a.l.Println("Starting the server on port", bindAddress)
+		a.l.Println("Starting the server on port", a.bindAddr)
 
 		err := srv.ListenAndServe()
 		if err != nil {

@@ -2,9 +2,6 @@ package data
 
 import (
 	"database/sql"
-	"log"
-
-	"github.com/shopspring/decimal"
 )
 
 /*
@@ -60,7 +57,7 @@ This function returns a list of all transactions owned by an {account_id}
 func GetTransactions(db *sql.DB, accountId int) (Transactions, error) {
 	rows, err := db.Query(
 		"SELECT * FROM public.transactions WHERE receiver_account_id=$1",
-		&accountId,
+		accountId,
 	)
 	if err != nil {
 		return nil, err
@@ -103,7 +100,7 @@ DEPOSIT, WITHDRAW or TRANSFER transaction is processed.
 func RegisterTransaction(db *sql.DB, p *Transaction) error {
 	return db.QueryRow(
 		"INSERT INTO public.transactions(amount, transaction_type, description, receiver_account_id, sender_account_id) VALUES ($1, $2, $3, $4, $5) RETURNING id",
-		&p.Amount, &p.TransactionType, &p.Description, &p.ReceiverAccountId, &p.SenderAccountId,
+		p.Amount, p.TransactionType, p.Description, p.ReceiverAccountId, p.SenderAccountId,
 	).Scan(&p.Id)
 }
 
@@ -128,23 +125,25 @@ is processed. New balance is calculated before the amount field is updated.
 
 This functions panics if there is any error while processing the update.
 */
-func UpdateAccount(db *sql.DB, p *Transaction, newBalance decimal.Decimal) {
-	if _, err := db.Exec(
+func UpdateAccount(db *sql.DB, p *Transaction, newBalance string) error {
+	_, err := db.Exec(
 		"UPDATE public.accounts SET balance=$1 WHERE id=$2;",
-		newBalance, &p.ReceiverAccountId,
-	); err != nil {
-		log.Fatal(err)
+		newBalance, p.ReceiverAccountId,
+	)
+	if err != nil {
+		return err
 	}
+	return nil
 }
 
 /*
 Used this function to update accounts' amount when a TRANSFER (EFT) event
 is processed. New balance is calculated before the amount field is updated.
 */
-func UpdateAccountsOnTransfer(db *sql.DB, p *Transaction, balanceSender, balanceReceiver decimal.Decimal) error {
+func UpdateAccountsOnTransfer(db *sql.DB, p *Transaction, balanceSender, balanceReceiver string) error {
 	_, err := db.Exec(
 		"UPDATE public.accounts SET balance=$1 WHERE id=$2",
-		&balanceSender, &p.SenderAccountId,
+		balanceSender, p.SenderAccountId,
 	)
 	if err != nil {
 		return err

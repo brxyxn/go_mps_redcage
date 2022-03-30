@@ -57,6 +57,18 @@ type transactionResponse struct {
 
 /*-------------*/
 
+/*
+Returns the details of the requested account
+swagger:response accountGetResponse
+*/
+type accountGetResponse struct {
+	// in: body
+	// required: true
+	Body data.Account
+}
+
+/*-------------*/
+
 // Data structure representing a list of accounts
 // swagger:response accountsResponse
 type accountsResponseWrapper struct {
@@ -109,5 +121,6 @@ type internalErrorResponseWrapper struct {
 
 // Generic Error is a generic error message returned by a server
 type GenericError struct {
-	Message string `json:"message"`
+	// "error":"message"
+	Error string `json:"error"`
 }

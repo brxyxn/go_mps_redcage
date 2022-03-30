@@ -25,7 +25,8 @@ type Account struct {
 	// The currency symbol or description of the account - USD, MXN, COP
 	// required: true
 	Currency string `json:"currency"`
-	// The account type - checking, savings, credit card
+
+	// The account type can be checking, savings, credit card
 	// required: true
 	AccountType AccountType `json:"accountType"`
 	// The status of the account, instead of deletion you change the status of the account

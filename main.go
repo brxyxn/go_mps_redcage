@@ -15,6 +15,7 @@ func main() {
 
 	a := App{}
 
+	u.InitLogs("go-mps-api ")
 	a.l = log.New(os.Stdout, "go-mps-api ", log.LstdFlags)
 
 	a.bindAddr = *bindAddress

@@ -3,29 +3,44 @@ consumes:
 - application/json
 definitions:
   Account:
+    description: Account structure for the API
     properties:
       accountId:
+        description: The id of the account
         format: uint64
         type: integer
         x-go-name: Id
       accountType:
         $ref: '#/definitions/AccountType'
       active:
+        description: The status of the account, instead of deletion you change the
+          status of the account
         type: boolean
         x-go-name: Active
       balance:
+        description: The current balance of the account
         type: string
         x-go-name: Balance
       clientId:
+        description: The ClientId is considered the FK of this model
         format: uint64
         type: integer
         x-go-name: ClientId
       createdAt:
+        description: Timestamp automatically included when the transaction is created
         type: string
         x-go-name: CreatedAt
       currency:
+        description: The currency symbol or description of the account - USD, MXN,
+          COP
         type: string
         x-go-name: Currency
+    required:
+    - balance
+    - currency
+    - accountType
+    - active
+    - clientId
     type: object
     x-go-package: github.com/brxyxn/go_mps_redcage/data
   AccountType:
@@ -37,32 +52,32 @@ definitions:
     type: array
     x-go-package: github.com/brxyxn/go_mps_redcage/data
   Client:
-    description: Product defines the structure for an API client
+    description: Client structure for the API
     properties:
       active:
-        description: The status for the client, instead of deletion you change the
+        description: The status of the client, instead of deletion you change the
           status of the client
         type: boolean
         x-go-name: Active
       clientId:
-        description: The id of the product
+        description: The id of the client
         format: uint64
         type: integer
         x-go-name: Id
       createdAt:
-        description: Timestamp automatically included when the user is created
+        description: Timestamp automatically included when the client is created
         type: string
         x-go-name: CreatedAt
       firstName:
-        description: The firstname for the client
+        description: The firstname of the client
         type: string
         x-go-name: Firstname
       lastName:
-        description: The lastname for the client
+        description: The lastname of the client
         type: string
         x-go-name: Lastname
       username:
-        description: The username for the client
+        description: The username of the client
         type: string
         x-go-name: Username
     required:
@@ -74,37 +89,51 @@ definitions:
   GenericError:
     description: Generic Error is a generic error message returned by a server
     properties:
-      message:
+      error:
+        description: '"error":"message"'
         type: string
-        x-go-name: Message
+        x-go-name: Error
     type: object
     x-go-package: github.com/brxyxn/go_mps_redcage/docs
   Transaction:
+    description: Transaction structure for the API
     properties:
       amount:
-        format: double
-        type: number
+        description: The transaction amount
+        type: string
         x-go-name: Amount
       createdAt:
+        description: Timestamp automatically included when the transaction is created
         type: string
         x-go-name: CreatedAt
       description:
+        description: The description of the transaction
         type: string
         x-go-name: Description
       receiverAccountId:
+        description: The account number/id of the receiver or affected account
         format: uint64
         type: integer
         x-go-name: ReceiverAccountId
       senderAccountId:
+        description: The account number/id of the sender account if it's a transfer
+          of funds
         format: uint64
         type: integer
         x-go-name: SenderAccountId
       transactionId:
+        description: The Id of the transaction
         format: uint64
         type: integer
         x-go-name: Id
       transactionType:
         $ref: '#/definitions/TransactionType'
+    required:
+    - amount
+    - transactionType
+    - description
+    - receiverAccountId
+    - senderAccountId
     type: object
     x-go-package: github.com/brxyxn/go_mps_redcage/data
   TransactionType:
@@ -149,7 +178,7 @@ paths:
           $ref: '#/responses/internalErrorResponse'
       tags:
       - clients
-  /clients/{client_id}/accounts/:
+  /clients/{client_id}/accounts:
     get:
       description: Return a list of the accounts listed by the {client_id}
       operationId: getAccounts
@@ -162,13 +191,25 @@ paths:
           $ref: '#/responses/notFoundErrorResponse'
       tags:
       - accounts
+    post:
+      description: Return the id of the new account including the details of it
+      operationId: createAccount
+      responses:
+        "201":
+          $ref: '#/responses/accountResponse'
+        "400":
+          $ref: '#/responses/badRequestErrorResponse'
+        "500":
+          $ref: '#/responses/internalErrorResponse'
+      tags:
+      - accounts
   /clients/{client_id}/accounts/{account_id}:
     get:
       description: Return the id of the new client
       operationId: getAccount
       responses:
         "200":
-          $ref: '#/responses/accountResponse'
+          $ref: '#/responses/accountGetResponse'
         "400":
           $ref: '#/responses/badRequestErrorResponse'
         "404":
@@ -202,22 +243,13 @@ paths:
           $ref: '#/responses/internalErrorResponse'
       tags:
       - transactions
-  /clients/{client_id}/accounts/new:
-    post:
-      description: Return the id of the new account including the details of it
-      operationId: createAccount
-      responses:
-        "201":
-          $ref: '#/responses/accountResponse'
-        "400":
-          $ref: '#/responses/badRequestErrorResponse'
-        "500":
-          $ref: '#/responses/internalErrorResponse'
-      tags:
-      - accounts
 produces:
 - application/json
 responses:
+  accountGetResponse:
+    description: Returns the details of the requested account
+    schema:
+      $ref: '#/definitions/Account'
   accountResponse:
     description: Created item returns the details of the account
     schema:

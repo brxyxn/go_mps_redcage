@@ -22,11 +22,12 @@ responses:
 CreateClient handles POST request and returns the ClientID of the new Client
 */
 func (c *Handlers) CreateClient(w http.ResponseWriter, r *http.Request) {
-	c.l.Println("Handle POST Clients")
+	u.LogInfo("Handling POST Clients /clients")
 
 	var v *data.Client
 	decoder := json.NewDecoder(r.Body)
 	if err := decoder.Decode(&v); err != nil {
+		u.LogDebug("GetClient handler:", err)
 		u.RespondWithError(w, http.StatusBadRequest, "Invalid request payload")
 		return
 	}
@@ -34,11 +35,13 @@ func (c *Handlers) CreateClient(w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 
 	if v.Firstname == "" || v.Lastname == "" || v.Username == "" {
+		u.LogDebug("GetClient handler: One or more required params are missing or empty value(s).")
 		u.RespondWithError(w, http.StatusBadRequest, "One or more required params are missing or empty value(s).")
 		return
 	}
 
 	if err := data.CreateClient(c.db, v); err != nil {
+		u.LogDebug("GetClient handler:", err)
 		u.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		return
 	}
@@ -58,7 +61,7 @@ responses:
 GetClient handles GET requests and returns the details of the requested Client
 */
 func (c *Handlers) GetClient(w http.ResponseWriter, r *http.Request) {
-	c.l.Println("Handling GET Clients")
+	c.l.Println("Handling GET Clients /clients/:client_id")
 
 	// db := c.db
 
@@ -66,6 +69,7 @@ func (c *Handlers) GetClient(w http.ResponseWriter, r *http.Request) {
 
 	clientId, err := strconv.Atoi(mux.Vars(r)["client_id"])
 	if err != nil {
+		u.LogDebug("GetClient handler:", err)
 		u.RespondWithError(w, http.StatusBadRequest, "Invalid client ID")
 		return
 	}
@@ -75,8 +79,10 @@ func (c *Handlers) GetClient(w http.ResponseWriter, r *http.Request) {
 	if err := data.GetClient(c.db, values); err != nil {
 		switch err {
 		case sql.ErrNoRows:
+			u.LogDebug("GetClient handler:", err)
 			u.RespondWithError(w, http.StatusNotFound, "This item was not found")
 		default:
+			u.LogDebug("GetClient handler:", err)
 			u.RespondWithError(w, http.StatusInternalServerError, err.Error())
 		}
 		return

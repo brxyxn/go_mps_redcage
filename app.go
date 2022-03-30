@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/brxyxn/go_mps_redcage/handlers"
+	u "github.com/brxyxn/go_mps_redcage/utils"
 	"github.com/go-openapi/runtime/middleware"
 	"github.com/gorilla/mux"
 	_ "github.com/jackc/pgx/v4/stdlib"
@@ -24,7 +25,7 @@ type App struct {
 	bindAddr string
 }
 
-func (a *App) InitRoutes() {
+func (a *App) initRoutes() {
 	h := handlers.NewHandlers(a.db, a.l)
 	// Client routes
 	a.Router.HandleFunc("/api/v1/clients", h.CreateClient).Methods("POST")
@@ -39,6 +40,8 @@ func (a *App) InitRoutes() {
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions", h.GetTransactions).Methods("GET")
 	a.Router.HandleFunc("/api/v1/clients/{client_id:[0-9]+}/accounts/{account_id:[0-9]+}/transactions", h.CreateTransaction).Methods("POST")
 
+	// Serving Documentation Web Server
+	// host:port/docs
 	opts := middleware.RedocOpts{SpecURL: "/docs/swagger.yaml"}
 	sh := middleware.Redoc(opts, nil)
 
@@ -52,8 +55,6 @@ include the following information as strings and also
 call Run setting the port to serve to the web.
 */
 func (a *App) Initialize(host, port, user, password, dbname string) {
-	// a.db
-
 	// connectionStr := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8&parseTime=True&loc=Local", user, password, host, port, dbname)
 	connectionStr := fmt.Sprintf(
 		"host=%s port=%v user=%s "+
@@ -64,7 +65,8 @@ func (a *App) Initialize(host, port, user, password, dbname string) {
 	var err error
 	a.db, err = sql.Open("pgx", connectionStr)
 	if err != nil {
-		a.l.Println("Error opening a new connection to the DB.", err)
+
+		u.LogInfo("Error opening a new connection to the DB.", err)
 	}
 
 	a.Router = mux.NewRouter() // Make sure this is set before the server is started
@@ -77,13 +79,13 @@ func (a *App) Initialize(host, port, user, password, dbname string) {
 		a.db.Close()
 		a.l.Fatal(err)
 	} else {
-		a.l.Println("Creating and seeding tables to initializate DB.")
+		u.LogInfo("(Optional)", "Creating and seeding tables to initializate DB.")
 
 		// Executing SQL statements to create tables and seed DB.
 		sqlDir := "db/docker_postgres_init.sql"
 		query, err := ioutil.ReadFile(sqlDir)
 		if err != nil {
-			a.l.Println(fmt.Sprintf("Error while reading %s file.", sqlDir), err)
+			u.LogError(fmt.Sprintf("Error while reading %s file.", sqlDir), err)
 		}
 
 		if _, err := a.db.Exec(string(query)); err != nil {
@@ -97,7 +99,7 @@ Runs the new server.
 */
 func (a *App) Run() {
 	// Initializing routes
-	a.InitRoutes()
+	a.initRoutes()
 
 	// Creating a new server
 	srv := http.Server{
@@ -111,7 +113,7 @@ func (a *App) Run() {
 
 	// Starting the server
 	go func() {
-		a.l.Println("Starting the server on port", a.bindAddr)
+		u.LogInfo("Running server on port", a.bindAddr)
 
 		err := srv.ListenAndServe()
 		if err != nil {
@@ -127,7 +129,7 @@ func (a *App) Run() {
 	// signal.Notify(sigchan, os.Kill) // If running on Windows
 
 	sigchan := <-cs
-	a.l.Println("Signal received:", sigchan)
+	u.LogDebug("Signal received:", sigchan)
 
 	ctx, fn := context.WithTimeout(context.Background(), 30*time.Second)
 	defer fn()

@@ -39,10 +39,7 @@ This project was developed as required by Redcage as a technical test developing
 ## Docker
 ### Pull repository
 ```bash
-docker pull brxyxn/go_mps_redcage:latest
-```
-```bash
-docker pull brxyxn/go_mps_redcage:dockerized
+docker pull brxyxn/go_mps_redcage:version2
 ```
 ### Versions
 The `latest` version works with ElephantSQL which is an online platform to connect our PostgreSQL database. However, you can still set up the `dockerized` tag but you must configure the PostgreSQL image locally to be able to run it.
@@ -84,8 +81,8 @@ cd go_mps_redcage
 
 > Verify dependencies
 ```bash
+go mod download
 go mod tidy
-# Note: If no errors are returned, move to the next step.
 go mod verify
 # Output: all modules verified
 ```
@@ -96,8 +93,7 @@ go run .
 # or
 go run main.go
 # Output:
-# 2022/01/25 12:57:22 API initialized!
-# 2022/01/25 12:57:22 Running at localhost:5000
+# go-mps-api 2022/03/29 23:53:57 [INFO] Running server on port :3000
 ```
 > After running the app you will see the output showing that the app is initialized and running.
 

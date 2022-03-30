@@ -5,6 +5,7 @@ This project was developed as required by Redcage as a technical test developing
 - [Docker 20.10.12](https://www.docker.com/get-started)
 - [Docker Compose 1.29.2](https://docs.docker.com/compose/)
 - [ElephantSQL](https://www.elephantsql.com)
+- [Swagger.io](https://swagger.io/)
 
 > Important Note: this project won't accept Pull Requests, however, you can use it as reference if need it to build your own project.
 
@@ -23,7 +24,7 @@ This project was developed as required by Redcage as a technical test developing
 		- [Create a new account](#create-a-new-account)
 		- [Create a new transaction](#create-a-new-transaction)
 	- [Database](#database)
-3. [What's Next](#whats-next)
+3. [What's next?](#whats-next)
 ---
 
 # Links
@@ -99,21 +100,31 @@ go run main.go
 # 2022/01/25 12:57:22 Running at localhost:5000
 ```
 > After running the app you will see the output showing that the app is initialized and running.
->
-> If the tables do not exist in the database the app will automatically create them. Refer below to see the schema.
+
+
+If the tables do not exist in the database the app will automatically create them. Refer below to see the schema. By default every table will be dropped for testing purposes, but you can remove those SQL queries from the file `docker_postgres_init.sql`.
+
+```plsql
+-- Remove these lines if you need to keep records up
+DROP TABLE IF EXISTS public.transactions;
+DROP TABLE IF EXISTS public.accounts;
+DROP TABLE IF EXISTS public.clients;
+```
 
 ## Methods
-|HTTP Method|URI Pattern |
-|---:|---|
-|POST|/api/v1/client/new|
-|GET |/api/v1/clients/**{client_id}**|
-|POST|/api/v1/clients/**{client_id}**/accounts/new|
-|GET |/api/v1/clients/**{client_id}**/accounts/**{account_id}**|
-|POST|/api/v1/clients/**{client_id}**/accounts/**{account_id}**/transactions/new|
-|GET |/api/v1/clients/**{client_id}**/accounts/**{account_id}**/transactions|
+
+| HTTP Method | URI Pattern                                                            |
+| -----------:| ---------------------------------------------------------------------- |
+| POST        | /api/v1/clients                                                        |
+| GET         | /api/v1/clients/**{client_id}**                                        |
+| POST        | /api/v1/clients/**{client_id}**/accounts                               |
+| GET         | /api/v1/clients/**{client_id}**/accounts                               |
+| GET         | /api/v1/clients/**{client_id}**/accounts/**{account_id}**              |
+| POST        | /api/v1/clients/**{client_id}**/accounts/**{account_id}**/transactions |
+| GET         | /api/v1/clients/**{client_id}**/accounts/**{account_id}**/transactions |
 
 ### Create a new client
-> /api/v1/clients/**new**
+> /api/v1/clients
 
 Accepted fields:
 - firstName as **string**.
@@ -129,7 +140,7 @@ Accepted fields:
 ```
 
 ### Create a new account
-> /api/v1/clients/*1*/accounts/**new**
+> /api/v1/clients/*1*/accounts
 
 Accepted fields:
 - balance as **numeric(13,2)**.  
@@ -167,7 +178,7 @@ For more details about currency symbols and codes check [this link.](https://www
 
 ```
 ### Create a new transaction
-> /api/v1/clients/*5*/accounts/*8*/transactions/**new** 
+> /api/v1/clients/*5*/accounts/*8*/transactions
 
 Accepted fields:
 - amount as **numeric(13,2)**.  

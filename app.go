@@ -43,10 +43,11 @@ func (a *App) initRoutes() {
 	// Serving Documentation Web Server
 	// host:port/docs
 	opts := middleware.RedocOpts{SpecURL: "/docs/swagger.yaml"}
+
 	sh := middleware.Redoc(opts, nil)
 
-	a.Router.Handle("/docs", sh)
 	a.Router.Handle("/docs/swagger.yaml", http.FileServer(http.Dir("./")))
+	a.Router.Handle("/docs", sh)
 }
 
 /*

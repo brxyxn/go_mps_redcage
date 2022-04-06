@@ -32,13 +32,13 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 # Copy the Pre-built binary file from the previous stage. Observe we also copied the .env file
+COPY --from=builder /app/docs/ ./docs/
 COPY --from=builder /app/main .
 COPY --from=builder /app/.env .
 COPY --from=builder /app/db/docker_postgres_init.sql ./db/
-RUN ls -a
 
-# Expose port 8080 to the outside world
-EXPOSE 8080
+# Expose port 3000 to the outside world
+EXPOSE 3000
 
-#Command to run the executable
+# Command to run the executable
 CMD ["./main"]

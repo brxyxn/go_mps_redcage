@@ -38,9 +38,9 @@ This project was developed as required by Redcage as a technical test developing
 # Links
 
 <p style="display: flex;flex-direction: row;">
-<a href="https://hub.docker.com/repository/docker/brxyxn/go_mps_redcage"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Docker_%28container_engine%29_logo.svg" alt="Docker repository" height="50"></a>
+<a href="https://hub.docker.com/r/brxyxn/go_mps_redcage"><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Docker_%28container_engine%29_logo.svg" alt="Docker repository" height="50"></a>
 
-<a href="https://hub.docker.com/r/brxyxn/go_mps_redcage"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Docker repository" height="50"></a>
+<a href="https://github.com/brxyxn/go_mps_redcage"><img src="https://upload.wikimedia.org/wikipedia/commons/9/91/Octicons-mark-github.svg" alt="Docker repository" height="50"></a>
 
 <a href="https://mpsgo.herokuapp.com/docs"><img src="https://www3.assets.heroku.com/assets/logo-purple-08fb38cebb99e3aac5202df018eb337c5be74d5214768c90a8198c97420e4201.svg" alt="Heroku app" height="50"></a>
 

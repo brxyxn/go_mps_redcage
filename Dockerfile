@@ -21,6 +21,7 @@ RUN go mod download
 
 # Copy the source from the current directory to the working Directory inside the container 
 COPY . .
+RUN ls -a
 
 # Build the Go app
 RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
@@ -38,7 +39,7 @@ COPY --from=builder /app/db/docker_postgres_init.sql ./db/
 RUN ls -a
 
 # Expose port 8080 to the outside world
-EXPOSE 8080
+EXPOSE 3000
 
 #Command to run the executable
 CMD ["./main"]

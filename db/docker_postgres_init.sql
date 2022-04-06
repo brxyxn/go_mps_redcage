@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS public."transactions";
+DROP TABLE IF EXISTS public.transactions;
 DROP TABLE IF EXISTS public.accounts;
 DROP TABLE IF EXISTS public.clients;
 
@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS public.accounts (
 	CONSTRAINT account_fk FOREIGN KEY (client_id) REFERENCES public.clients(id) ON DELETE CASCADE
 );
 
-CREATE TABLE IF NOT EXISTS public."transactions" (
+CREATE TABLE IF NOT EXISTS public.transactions (
 	id integer NOT NULL GENERATED ALWAYS AS IDENTITY,
 	amount varchar NOT NULL,
 	transaction_type smallint NOT NULL,

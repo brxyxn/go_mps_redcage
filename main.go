@@ -8,8 +8,6 @@ import (
 	u "github.com/brxyxn/go_mps_redcage/utils"
 )
 
-var bindAddress = flag.String("BIND_ADDRESS", ":3000", "Bind address for the server")
-
 func main() {
 	flag.Parse()
 
@@ -18,7 +16,13 @@ func main() {
 	u.InitLogs("go-mps-api ")
 	a.l = log.New(os.Stdout, "go-mps-api ", log.LstdFlags)
 
-	a.bindAddr = *bindAddress
+	port := os.Getenv("PORT")
+	if port == "" {
+		a.bindAddr = ":" + "3000"
+	} else {
+		a.bindAddr = ":" + port
+	}
+	u.LogInfo(a.bindAddr)
 
 	a.Initialize(
 		u.DotEnvGet("DB_HOST"),
